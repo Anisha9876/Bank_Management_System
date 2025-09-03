@@ -1,0 +1,52 @@
+package com.example.Bank_Anisha.Controller;
+
+import com.example.Bank_Anisha.Entity.TransactionEntity;
+import com.example.Bank_Anisha.Mapper.TransactionMapper;
+import com.example.Bank_Anisha.Service.TransacService;
+import com.example.Bank_Anisha.dto.TransactionDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/transaction/")
+public class TransacController {
+
+    private TransacService service;
+
+    public TransacController(TransacService service) {
+        this.service = service;
+    }
+    @PutMapping("{accountId}/withdraw")
+   public ResponseEntity<TransactionDto> withdraw(@RequestParam Double amount
+            ,@PathVariable Long accountId){
+       TransactionEntity transaction = service.withdraw(amount, accountId);
+       TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
+       return ResponseEntity.ok(dto);
+   }
+   @PutMapping("{accountId}/deposit")
+    public ResponseEntity<TransactionDto> Deposit(@PathVariable Long accountId,
+                                                  @RequestParam Double amount){
+       TransactionEntity transaction = service.Deposit(amount, accountId);
+       TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
+       return ResponseEntity.ok(dto);
+   }
+
+   @PutMapping("Debit/{id1}/{id2}/{amount}")
+    public ResponseEntity<TransactionDto> DebitAmount(@PathVariable Long id1
+           , @PathVariable Long id2
+           , @PathVariable Double amount){
+       TransactionDto debitDto = service.DebitAmounts(id1, id2, amount);
+       return ResponseEntity.ok(debitDto);
+
+
+   }
+    @PutMapping("Credit/{id1}/{id2}/{amount}")
+    public ResponseEntity<TransactionDto> CreditAmount(@PathVariable Long id1
+            , @PathVariable Long id2
+            , @PathVariable Double amount){
+        TransactionDto creditDto = service.CreditAmounts(id1, id2, amount);
+        return ResponseEntity.ok(creditDto);
+
+
+    }
+}
