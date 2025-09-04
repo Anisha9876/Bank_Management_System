@@ -21,7 +21,7 @@ It allows users to manage bank accounts, perform transactions, and view history 
 1. Clone the repo:
    ```bash
    git clone https://github.com/Anisha9876/Bank_Management_System.git
-   License
+  
    
 ## License
 This project is licensed under the [MIT License](./LICENSE).
