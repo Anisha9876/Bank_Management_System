@@ -147,6 +147,7 @@ public Account deactivatedAccount(Long id, String status){
     return bankRepository.save(account);
 }
 
+
 @Override
     public Account isDeletedById(long id){
     Account account = bankRepository.findByIdAndDeletedFalse(id)

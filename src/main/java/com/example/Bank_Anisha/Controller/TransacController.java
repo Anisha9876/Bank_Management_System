@@ -3,9 +3,12 @@ package com.example.Bank_Anisha.Controller;
 import com.example.Bank_Anisha.Entity.TransactionEntity;
 import com.example.Bank_Anisha.Mapper.TransactionMapper;
 import com.example.Bank_Anisha.Service.TransacService;
+import com.example.Bank_Anisha.dto.API_Response;
 import com.example.Bank_Anisha.dto.TransactionDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/transaction/")
@@ -34,8 +37,10 @@ public class TransacController {
    @PutMapping("Debit/{id1}/{id2}/{amount}")
     public ResponseEntity<TransactionDto> DebitAmount(@PathVariable Long id1
            , @PathVariable Long id2
-           , @PathVariable Double amount){
+           , @PathVariable Double amount
+           ){
        TransactionDto debitDto = service.DebitAmounts(id1, id2, amount);
+
        return ResponseEntity.ok(debitDto);
 
 
@@ -47,6 +52,16 @@ public class TransacController {
         TransactionDto creditDto = service.CreditAmounts(id1, id2, amount);
         return ResponseEntity.ok(creditDto);
 
+    }
+    @GetMapping("transaction/{id}")
+    public ResponseEntity<API_Response<List<TransactionDto>>> getTransactions(@PathVariable Long id
+            , @RequestParam Integer page
+            , @RequestParam Integer size){
+        List<TransactionDto> account = service.getAllTransactions(size, page, id);
+        if(account.isEmpty()){
+            return ResponseEntity.ok(new API_Response<>(account,"No Transaction"));
+        }
+        return ResponseEntity.ok(new API_Response<>(account,"success"));
 
     }
 }

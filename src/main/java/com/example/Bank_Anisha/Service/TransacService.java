@@ -4,16 +4,27 @@ import com.example.Bank_Anisha.Entity.Account;
 import com.example.Bank_Anisha.Entity.TransactionEntity;
 import com.example.Bank_Anisha.Entity.TransactionType;
 import com.example.Bank_Anisha.Mapper.TransactionMapper;
+import com.example.Bank_Anisha.Mapper.mapper;
 import com.example.Bank_Anisha.dto.TransactionDto;
 import com.example.Bank_Anisha.repository.BankRepository;
 import com.example.Bank_Anisha.repository.TransactionRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 //import static com.example.Bank_Anisha.Entity.TransactionType.Deposit;
 
@@ -41,7 +52,7 @@ public class TransacService {
         if(account.getBalance()< amount){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Amount should be less than balance");
         }
-        
+
 
         account.setBalance(account.getBalance()-amount);
 
@@ -136,6 +147,29 @@ public class TransacService {
         bankRepository.save(toAccount);
         TransactionDto dto = TransactionMapper.mapToTransactionDto(entity);
         return dto;
+
+    }
+    private final Map<Integer, Integer> pageSizeHistory = new HashMap<>();
+    public List<TransactionDto> getAllTransactions(Integer size, Integer page, Long id){
+        pageSizeHistory.put(page, size);
+        List<TransactionEntity> allAccounts = transactionRepo.findByAccountIdOrderByTimestampDesc(id);
+        int startIndex = 0;
+        for (int i = 0; i < page; i++) {
+            startIndex += pageSizeHistory.getOrDefault(i, 0); // if previous page not yet requested, treat as 0
+        }
+
+        int endIndex = Math.min(startIndex + size, allAccounts.size());
+
+        if (startIndex >= allAccounts.size()) {
+            return List.of(); // No data left
+        }
+        List<TransactionDto> pageAccounts = allAccounts.stream()
+                .map(TransactionMapper::mapToTransactionDto)
+                .collect(Collectors.toList());
+        List<TransactionDto> accounts = pageAccounts.subList(startIndex, endIndex);
+
+
+        return accounts;
 
     }
 }

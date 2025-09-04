@@ -1,11 +1,14 @@
 package com.example.Bank_Anisha.dto;
 
 import com.example.Bank_Anisha.Entity.Account;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class API_Response<T>{
 
         private String status;
@@ -28,6 +31,10 @@ public class API_Response<T>{
             this.timestamp = LocalDateTime.now();
         }
 
+    public API_Response(T account, String success) {
+        this.data=account;
+        this.status=success;
+    }
 
 
     public static <T> API_Response<T> success(T data, long count) {
