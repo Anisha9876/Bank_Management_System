@@ -26,6 +26,7 @@ public class Account {
     private double balance;
     private String status;
     private boolean deleted;
+    private final Integer minimumBalance=1000;
 
     @OneToMany(mappedBy ="account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

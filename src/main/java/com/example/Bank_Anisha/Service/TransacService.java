@@ -55,6 +55,9 @@ public class TransacService {
 
 
         account.setBalance(account.getBalance()-amount);
+        if(account.getBalance()< account.getMinimumBalance()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Insufficient Balance your balance will cross the minimumBalance");
+        }
 
         TransactionEntity tran = TransactionEntity.builder()
                 .account(account)
@@ -108,6 +111,9 @@ public class TransacService {
         }
         toAccount.setBalance(toAccount.getBalance()+amount);
         fromAccount.setBalance(fromAccount.getBalance()-amount);
+        if(fromAccount.getBalance()< fromAccount.getMinimumBalance()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Insufficient Balance your balance will cross the minimumBalance");
+        }
 
         TransactionEntity entity = TransactionEntity.builder()
                 .amount(amount)
@@ -135,6 +141,9 @@ public class TransacService {
         }
         toAccount.setBalance(toAccount.getBalance()+amount);
         fromAccount.setBalance(fromAccount.getBalance()-amount);
+//        if(fromAccount.getBalance()< fromAccount.getMinimumBalance()){
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Insufficient Balance your balance will cross the minimumBalance");
+//        }
 
         TransactionEntity entity = TransactionEntity.builder()
                 .amount(amount)

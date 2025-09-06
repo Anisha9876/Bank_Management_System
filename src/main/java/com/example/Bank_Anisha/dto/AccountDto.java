@@ -21,6 +21,7 @@ public class AccountDto {
     private double balance;
     private String status;
     private boolean isDeleted;
+    private final Integer minimumBalance=1000;
     private List<TransactionEntity> transactions;
 
 }
