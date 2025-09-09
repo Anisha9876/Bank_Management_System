@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name="accounts")
 @Entity
 @Builder
-public class Account {
+public class Account extends BaseEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
