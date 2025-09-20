@@ -8,10 +8,11 @@ import com.example.Bank_Anisha.repository.BankRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -158,4 +159,36 @@ public Account deactivatedAccount(Long id, String status){
     return acc;
 }
 
+    @Override
+    public Account applyInterest(long id, Double rate) {
+        Account account=bankRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("account not found"));
+
+        if (rate != null) {
+            account.setRateOfInterest(rate);
+        }
+        LocalDateTime current=LocalDateTime.now();
+
+        LocalDateTime lastApplied =
+                account.getLastInterestAppliedDate() != null ? account.getLastInterestAppliedDate() :
+                        account.getCreatedAt() != null ? account.getCreatedAt() :
+                                LocalDateTime.now();
+        long days = ChronoUnit.DAYS.between(lastApplied.minusDays(30), current);
+        double years = days / 365.0;
+
+        Double principal=account.getBalance();
+        Double rateOfInterest =account.getRateOfInterest() != null ? account.getRateOfInterest() : 5.0;
+
+        double amount = principal * Math.pow(1 + (rateOfInterest / 100.0), years);
+        double interest = amount - principal;
+
+        account.setBalance(principal+interest);
+        Double totalInterest = account.getInterestEarned() != null ? account.getInterestEarned() : 0.0;
+        account.setInterestEarned(totalInterest + interest);
+        account.setLastInterestAppliedDate(current);
+
+        bankRepository.save(account);
+
+        return account;
+    }
 }

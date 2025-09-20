@@ -27,6 +27,8 @@ public class TransactionEntity {
 
     private LocalDateTime timestamp;
 
+
+
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     @JsonBackReference

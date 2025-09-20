@@ -139,5 +139,28 @@ public class BankController {
 
       return ResponseEntity.ok(response);
   }
+    @PostMapping("/{id}/apply-interest")
+    public ResponseEntity<Account> applyInterest(
+            @PathVariable long id,
+            @RequestParam(required = false) Double rate) {
+
+        Account updatedAccount = bankService.applyInterest(id, rate);
+        return ResponseEntity.ok(updatedAccount);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 

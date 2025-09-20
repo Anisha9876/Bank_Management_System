@@ -27,6 +27,8 @@ public class Account extends BaseEntity {
     private String status;
     private boolean deleted;
     private final Integer minimumBalance=1000;
+    private Double rateOfInterest=5.0;
+    private Double interestEarned= 0.0;
 
     @OneToMany(mappedBy ="account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

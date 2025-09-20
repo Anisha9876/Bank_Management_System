@@ -5,6 +5,7 @@ import com.example.Bank_Anisha.Mapper.TransactionMapper;
 import com.example.Bank_Anisha.Service.TransacService;
 import com.example.Bank_Anisha.dto.API_Response;
 import com.example.Bank_Anisha.dto.TransactionDto;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,4 +65,6 @@ public class TransacController {
         return ResponseEntity.ok(new API_Response<>(account,"success"));
 
     }
+
+
 }

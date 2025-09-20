@@ -26,4 +26,6 @@ public interface BankService {
    Account deactivatedAccount(Long id, String status);
 
    Account isDeletedById(long id);
+
+   Account applyInterest(long id, Double rate);
 }
