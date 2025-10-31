@@ -28,7 +28,7 @@ public class BaseEntity
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public LocalDateTime getUpdateAt() {
         return updateAt;
     }
 

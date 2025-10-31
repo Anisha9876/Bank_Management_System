@@ -6,16 +6,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class AccountDto {
 
     private Long id;
     @NotBlank(message = "Account holder name cannot be blank")
     private String accountHolderName;
+    private String password;
     @NotNull(message = "Balance is required")
     @Min(value = 100, message = "Balance must be greater than or equal to 100")
     private double balance;

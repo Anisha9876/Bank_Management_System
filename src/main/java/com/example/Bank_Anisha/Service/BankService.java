@@ -28,4 +28,6 @@ public interface BankService {
    Account isDeletedById(long id);
 
    Account applyInterest(long id, Double rate);
+
+   List<AccountDto> getAllAccFromFile();
 }

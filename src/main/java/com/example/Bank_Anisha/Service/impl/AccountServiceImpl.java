@@ -5,7 +5,10 @@ import com.example.Bank_Anisha.Mapper.mapper;
 import com.example.Bank_Anisha.Service.BankService;
 import com.example.Bank_Anisha.dto.AccountDto;
 import com.example.Bank_Anisha.repository.BankRepository;
+import com.example.Bank_Anisha.repository.FileRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -20,14 +24,25 @@ import static java.util.stream.Collectors.toList;
 public class AccountServiceImpl implements BankService {
     private BankRepository bankRepository;
 
-    public AccountServiceImpl(BankRepository bankRepository) {
+    private FileRepository fileRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    public AccountServiceImpl(BankRepository bankRepository,FileRepository fileRepository) {
         this.bankRepository = bankRepository;
+        this.fileRepository = fileRepository;
     }
 
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
+
+
         Account account= mapper.mapToAccount(accountDto);
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         Account save = bankRepository.save(account);
+        fileRepository.saveDetails(account);
         return mapper.mapToAccountDto(save);
 
     }
@@ -77,6 +92,14 @@ public class AccountServiceImpl implements BankService {
         List<Account> accounts = bankRepository.findByDeletedFalse();
         return accounts.stream().map((account) -> mapper.mapToAccountDto(account))
                 .collect(toList());
+    }
+
+    @Override
+    public List<AccountDto> getAllAccFromFile() {
+        List<Account> accounts = fileRepository.readDetails();
+        return accounts.stream()
+                .map(mapper::mapToAccountDto)
+                .collect(Collectors.toList());
     }
 
   //  @Override

@@ -12,6 +12,9 @@ import com.example.Bank_Anisha.dto.AccountDto;
 import com.example.Bank_Anisha.dto.TransactionDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,22 +36,28 @@ public class BankController {
     @PostMapping
     public ResponseEntity<API_Response<AccountDto>> addAccount(@Valid @RequestBody AccountDto accountDto){
         AccountDto createdAccount = bankService.createAccount(accountDto);
+
         return new ResponseEntity<>(new API_Response<>("success", "Account created successfully", createdAccount), HttpStatus.CREATED);
     }
+
     @Autowired
     private TransacService Transacservice;
-    //deposite REST Api
+    //deposit REST Api
     @PutMapping("/{id}/deposit")
+    @CachePut(value = "bank",key="#id")
     public ResponseEntity<API_Response<TransactionDto>> deposit(@PathVariable Long id
                                                , @RequestBody Map<String,Double> request){
-        TransactionEntity transaction = Transacservice.withdraw(request.get("amount"), id);
+        TransactionEntity transaction = Transacservice.Deposit(request.get("amount"), id);
 
         TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
         return  ResponseEntity.ok(new API_Response<>("success", "Amount deposited successfully", dto));
     }
+
+
     //withdraw REST API
     @PutMapping("/{id}/withdraw")
-    public ResponseEntity<API_Response<TransactionDto>> withdraw(
+    @CachePut(value = "bank",key="#id")
+    public TransactionDto withdraw(
             @PathVariable Long id,
             @Valid @RequestBody Map<String,Double> request){
 
@@ -57,14 +66,20 @@ public class BankController {
 
         TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
 
-        return ResponseEntity.ok(new API_Response<>("success", "Amount withdraw successfully", dto));
+        return dto;
     }
+
+
     //Get All Accounts REST API
     @GetMapping
     public ResponseEntity<API_Response<List<AccountDto>>> getAllAccounts(){
         List<AccountDto> allAccounts = bankService.getAllAccounts();
+
         return ResponseEntity.ok(new API_Response<>("success", "All accounts fetched", allAccounts));
     }
+
+
+
     //Delete Account Rest API
     // it is hard coded so we use soft delete below
 //    @DeleteMapping("/{id}")
@@ -73,7 +88,10 @@ public class BankController {
 //        return  ResponseEntity.ok(new API_Response<>("success", "Account deleted successfully", null));
 //    }
 
+
+
     @GetMapping("/{id}")
+    @Cacheable(value = "bank",key="#id")
     public ResponseEntity<API_Response<AccountDto>> getAccountsById(@PathVariable Long id) {
         AccountDto account = bankService.getAccountById(id);
         if (account == null) {
@@ -87,7 +105,9 @@ public class BankController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/search")
+    @Cacheable(value = "bank",key="#accountHolderName")
     public ResponseEntity<Map<String, Object>> getAllByNames(@RequestParam(defaultValue = "0") int page,
                                                                         @RequestParam(defaultValue = "5") int size,
                                                                         @RequestParam String accountHolderName
@@ -106,8 +126,11 @@ public class BankController {
 
     }
 
+
+
     //getBank accounts by balance
     @GetMapping("/filter")
+    @Cacheable(value = "bank",key="#minBalance")
     public ResponseEntity<API_Response<AccountDto>> getAccountsBalance(@RequestParam double minBalance, @RequestParam double maxBalance){
         List<AccountDto> accounts = bankService.
                 getAllAccountsByBalance(minBalance, maxBalance).stream().map(mapper::mapToAccountDto)
@@ -117,7 +140,10 @@ public class BankController {
         return ResponseEntity.ok(new API_Response("success","get balance",accounts));
         
     }
+
+
     @PutMapping("/{id}/status")
+    @CachePut(value = "bank",key="#id")
     public ResponseEntity<String> activate(@PathVariable long id, @RequestParam String status){
         if(status.equalsIgnoreCase("ACTIVATE")){
             Account account = bankService.activatedAccount(id, status);
@@ -131,7 +157,10 @@ public class BankController {
 
 
     }
+
+
   @PutMapping("/delete/{id}")
+  @CacheEvict(value = "bank",key="#id")
     public ResponseEntity<API_Response<AccountDto>> deletedById(@PathVariable long id){
       Account acc = bankService.isDeletedById(id);
       AccountDto dto= mapper.mapToAccountDto(acc);
@@ -139,6 +168,9 @@ public class BankController {
 
       return ResponseEntity.ok(response);
   }
+
+
+
     @PostMapping("/{id}/apply-interest")
     public ResponseEntity<Account> applyInterest(
             @PathVariable long id,
@@ -148,7 +180,11 @@ public class BankController {
         return ResponseEntity.ok(updatedAccount);
     }
 
-
+    @GetMapping("/getFromFile")
+    public ResponseEntity<List<AccountDto>> getAllAccountsFromFile() {
+        List<AccountDto> accounts = bankService.getAllAccFromFile();
+        return ResponseEntity.ok(accounts);
+    }
 
 
 

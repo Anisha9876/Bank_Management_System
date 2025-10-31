@@ -10,13 +10,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TransactionDto {
+public class TransactionDto implements Serializable {
     private Long id;
     private double amount;
     private TransactionType transactionType;

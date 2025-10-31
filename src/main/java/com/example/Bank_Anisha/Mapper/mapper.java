@@ -13,16 +13,19 @@ public class mapper {
                 account.setBalance(accountDto.getBalance());
                 account.setStatus(accountDto.getStatus());
                 account.setDeleted(accountDto.isDeleted());
+                account.setPassword(account.getPassword());
                 return account;
     }
     public static AccountDto mapToAccountDto(Account account){
         AccountDto accountDto=new AccountDto(
         account.getId(),
         account.getAccountHolderName(),
-        account.getBalance(),
+       account.getPassword(),
+         account.getBalance(),
          account.getStatus(),
           account.isDeleted(),
           account.getTransactions()
+
         );
         return accountDto;
     }
