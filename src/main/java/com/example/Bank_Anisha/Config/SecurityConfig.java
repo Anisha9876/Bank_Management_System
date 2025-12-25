@@ -3,6 +3,7 @@ package com.example.Bank_Anisha.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,11 +27,20 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/auth/register").permitAll()    // login allowed
                         .anyRequest().authenticated()              // others need token
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(form -> form
+                        //.defaultSuccessUrl("/home", true) // optional redirect
+                        .permitAll()
+                )
+                .oauth2Login(Customizer.withDefaults())
+                .logout(logout -> logout.permitAll())
+
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

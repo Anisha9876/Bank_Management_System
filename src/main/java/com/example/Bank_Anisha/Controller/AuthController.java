@@ -15,9 +15,6 @@ public class AuthController {
     private BankRepository bankRepo;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private JwtUtil jwtUtil;
 
     // POST: /auth/login
@@ -26,7 +23,7 @@ public class AuthController {
 
         Account user = bankRepo.findByAccountHolderName(username);
 
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+        if (user != null && user.getPassword().equals(password)) {
             // generate JWT
             String token = jwtUtil.generateToken(username);
             return "Login successful! Your token: " + token;
@@ -34,7 +31,7 @@ public class AuthController {
             return "Invalid username or password!";
         }
     }
-    @PostMapping("/register")
+    @PostMapping("/signup")
     public String register(@RequestParam String username ,@RequestParam String password){
       Account user= bankRepo.findByAccountHolderName(username);
       if(user != null){
@@ -46,6 +43,7 @@ public class AuthController {
         account.setStatus("ACTIVE");
         account.setDeleted(false);
         account.setPassword(password);
+        bankRepo.save(account);
         return "Registration successful!";
 
 
