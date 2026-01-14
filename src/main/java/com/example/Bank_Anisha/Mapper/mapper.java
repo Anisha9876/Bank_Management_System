@@ -13,7 +13,7 @@ public class mapper {
                 account.setBalance(accountDto.getBalance());
                 account.setStatus(accountDto.getStatus());
                 account.setDeleted(accountDto.isDeleted());
-                account.setPassword(account.getPassword());
+                account.setPassword(accountDto.getPassword());
                 return account;
     }
     public static AccountDto mapToAccountDto(Account account){
