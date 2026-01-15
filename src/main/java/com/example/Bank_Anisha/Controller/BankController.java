@@ -28,10 +28,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/accounts")
 public class BankController {
     private BankService bankService;
+    private TransacService transacService;
 
-    public BankController(BankService bankService) {
+    public BankController(BankService bankService, TransacService transacService) {
         this.bankService = bankService;
+        this.transacService = transacService;
     }
+
+
+
+
+
     //add AccountREST API
     @PostMapping
     public ResponseEntity<API_Response<AccountDto>> addAccount(@Valid @RequestBody AccountDto accountDto){
@@ -40,14 +47,13 @@ public class BankController {
         return new ResponseEntity<>(new API_Response<>("success", "Account created successfully", createdAccount), HttpStatus.CREATED);
     }
 
-    @Autowired
-    private TransacService Transacservice;
+
     //deposit REST Api
     @PutMapping("/{id}/deposit")
     @CachePut(value = "bank",key="#id")
     public ResponseEntity<API_Response<TransactionDto>> deposit(@PathVariable Long id
                                                , @RequestBody Map<String,Double> request){
-        TransactionEntity transaction = Transacservice.Deposit(request.get("amount"), id);
+        TransactionEntity transaction = transacService.Deposit(request.get("amount"), id);
 
         TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
         return  ResponseEntity.ok(new API_Response<>("success", "Amount deposited successfully", dto));
@@ -62,7 +68,7 @@ public class BankController {
             @Valid @RequestBody Map<String,Double> request){
 
         Double amount = request.get("amount");
-        TransactionEntity transaction = Transacservice.withdraw(amount, id);
+        TransactionEntity transaction = transacService.withdraw(amount, id);
 
         TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
 
