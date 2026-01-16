@@ -74,4 +74,26 @@ public class BankControllerTest {
     Assertions.assertEquals(entity.getAmount(),depositAmount.getBody().getData().getAmount());
 
     }
+
+    @Test
+    public void withdrawTest(){
+        Account account1=new Account();
+        account1.setPassword("2");
+        account1.setId(2L);
+        account1.setAccountHolderName("Pratik Parida");
+        account1.setBalance(21000.0);
+
+        TransactionEntity ent=new TransactionEntity();
+        ent.setAccount(account1);
+        ent.setAmount(2000.0);
+        ent.setId(2L);
+        Map<String,Double> map=new HashMap<>();
+        map.put("amount",2000.0);
+
+        Mockito.when(transService.withdraw(2000.0,2L)).thenReturn(ent);
+        TransactionDto withdraw = bankController.withdraw(2L, map);
+        Assertions.assertEquals(ent.getAmount(),withdraw.getAmount());
+        Assertions.assertEquals(21000.0,withdraw.getAccount().getBalance());
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.Bank_Anisha.dto;
 
+import com.example.Bank_Anisha.Entity.Account;
 import com.example.Bank_Anisha.Entity.TransactionType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,4 +24,7 @@ public class TransactionDto implements Serializable {
     private TransactionType transactionType;
     private Long accountId;
     private LocalDateTime timestamp;
+    private Account account;
+
+
 }
