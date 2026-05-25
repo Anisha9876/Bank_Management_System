@@ -91,9 +91,9 @@ public class BankControllerTest {
         map.put("amount",2000.0);
 
         Mockito.when(transService.withdraw(2000.0,2L)).thenReturn(ent);
-        TransactionDto withdraw = bankController.withdraw(2L, map);
-        Assertions.assertEquals(ent.getAmount(),withdraw.getAmount());
-        Assertions.assertEquals(21000.0,withdraw.getAccount().getBalance());
+        ResponseEntity<API_Response<TransactionDto>> withdraw = bankController.withdraw(2L, map);
+        Assertions.assertEquals(ent.getAmount(),withdraw.getBody().getAmount());
+        Assertions.assertEquals(21000.0,withdraw.getBody().getAccount().getBalance());
 
     }
 }

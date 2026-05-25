@@ -22,34 +22,49 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()    // login allowed
-                        .anyRequest().authenticated()              // others need token
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/register",
+                                "/oauth2/**",
+                                "/login/oauth2/**"
+                        ).permitAll()
+                        .requestMatchers("/api/accounts").authenticated()
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        //.defaultSuccessUrl("/home", true) // optional redirect
+                // DISABLE default form login page
+                .formLogin(form -> form.disable())
+
+                // Keep OAuth2 with success handler
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/auth/oauth-success", true)
+                        .failureUrl("/auth/login?error=true")
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
                         .permitAll()
                 )
-                .oauth2Login(Customizer.withDefaults())
-                .logout(logout -> logout.permitAll())
-
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                // STATELESS because you're using JWT
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-
-            return NoOpPasswordEncoder.getInstance(); // no encryption
-
+        // BCrypt is secure - NEVER use NoOpPasswordEncoder in production
+        return new BCryptPasswordEncoder();
     }
 
 }

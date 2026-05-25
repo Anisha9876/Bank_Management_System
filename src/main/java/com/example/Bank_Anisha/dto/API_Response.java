@@ -2,12 +2,13 @@ package com.example.Bank_Anisha.dto;
 
 import com.example.Bank_Anisha.Entity.Account;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
+@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class API_Response<T>{
 

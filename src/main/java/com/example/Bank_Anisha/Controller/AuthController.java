@@ -4,8 +4,10 @@ import com.example.Bank_Anisha.Entity.Account;
 import com.example.Bank_Anisha.Security.JwtUtil;
 import com.example.Bank_Anisha.repository.BankRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,34 +19,48 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // POST: /auth/login
+    @Autowired
+    private PasswordEncoder passwordEncoder;  // ← ADD THIS
+
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String password = request.get("password");
 
         Account user = bankRepo.findByAccountHolderName(username);
 
-        if (user != null && user.getPassword().equals(password)) {
-            // generate JWT
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            // ✅ BCrypt comparison
             String token = jwtUtil.generateToken(username);
-            return "Login successful! Your token: " + token;
+            return ResponseEntity.ok(Map.of(
+                    "message", "Login successful!",
+                    "token", token
+            ));
         } else {
-            return "Invalid username or password!";
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "Invalid username or password!"));
         }
     }
+
     @PostMapping("/signup")
-    public String register(@RequestParam String username ,@RequestParam String password){
-      Account user= bankRepo.findByAccountHolderName(username);
-      if(user != null){
-          return "User already exits";
-      }
-        Account account= new Account();
+    public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String password = request.get("password");
+
+        Account user = bankRepo.findByAccountHolderName(username);
+        if (user != null) {
+            return ResponseEntity.status(400)
+                    .body(Map.of("message", "User already exists!"));
+        }
+
+        Account account = new Account();
         account.setBalance(1000);
         account.setAccountHolderName(username);
         account.setStatus("ACTIVE");
         account.setDeleted(false);
-        account.setPassword(password);
-        bankRepo.save(account);
-        return "Registration successful!";
-    }
+        account.setPassword(passwordEncoder.encode(password));  // ✅ BCrypt encoding
 
+        bankRepo.save(account);
+        return ResponseEntity.ok(Map.of("message", "Registration successful!"));
+    }
 }

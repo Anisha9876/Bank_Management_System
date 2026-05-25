@@ -50,7 +50,7 @@ public class BankController {
 
     //deposit REST Api
     @PutMapping("/{id}/deposit")
-    @CachePut(value = "bank",key="#id")
+    @CacheEvict(value = "bank",key="#id")
     public ResponseEntity<API_Response<TransactionDto>> deposit(@PathVariable Long id
                                                , @RequestBody Map<String,Double> request){
         TransactionEntity transaction = transacService.Deposit(request.get("amount"), id);
@@ -62,8 +62,8 @@ public class BankController {
 
     //withdraw REST API
     @PutMapping("/{id}/withdraw")
-    @CachePut(value = "bank",key="#id")
-    public TransactionDto withdraw(
+    @CacheEvict(value = "bank",key="#id")
+    public ResponseEntity<API_Response<TransactionDto>> withdraw(
             @PathVariable Long id,
             @Valid @RequestBody Map<String,Double> request){
 
@@ -72,7 +72,9 @@ public class BankController {
 
         TransactionDto dto = TransactionMapper.mapToTransactionDto(transaction);
 
-        return dto;
+        return ResponseEntity.ok(new API_Response<>("success",
+                "Amount withdrawn successfully", dto));
+
     }
 
 
