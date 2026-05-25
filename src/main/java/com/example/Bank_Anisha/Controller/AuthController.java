@@ -45,8 +45,6 @@ public class AuthController {
         account.setPassword(password);
         bankRepo.save(account);
         return "Registration successful!";
-
-
     }
 
 }

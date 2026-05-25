@@ -5,8 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the jar file from your system to the container
-COPY target/Bank_Anisha-0.0.1-SNAPSHOT.jar app.jar
-
+COPY target/*.jar app.jar
 # Expose the port your Spring Boot app runs on
 EXPOSE 8080
 
