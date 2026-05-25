@@ -27,26 +27,26 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
+                                "/auth/signup",
                                 "/auth/register",
                                 "/oauth2/**",
                                 "/login/oauth2/**"
                         ).permitAll()
-                        .requestMatchers("/api/accounts").authenticated()
                         .anyRequest().authenticated()
                 )
-                // DISABLE default form login page
                 .formLogin(form -> form.disable())
-
-                // Keep OAuth2 with success handler
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/auth/oauth-success", true)
                         .failureUrl("/auth/login?error=true")
                 )
-                .logout(logout -> logout
-                        .logoutUrl("/auth/logout")
-                        .permitAll()
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            response.getWriter()
+                                    .write("{\"error\": \"Unauthorized - Please login\"}");
+                        })
                 )
-                // STATELESS because you're using JWT
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
