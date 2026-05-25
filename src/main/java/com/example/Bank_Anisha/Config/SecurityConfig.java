@@ -30,15 +30,16 @@ public class SecurityConfig {
                                 "/auth/signup",
                                 "/auth/register",
                                 "/oauth2/**",
-                                "/login/oauth2/**"
+                                "/login/oauth2/**",
+                                "/error"          // ✅ add this too
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())
-                .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("/auth/oauth-success", true)
-                        .failureUrl("/auth/login?error=true")
-                )
+
+                // ✅ Remove oauth2Login completely for now
+                // .oauth2Login(...)
+
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(401);
